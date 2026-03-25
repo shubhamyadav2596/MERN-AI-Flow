@@ -34,20 +34,24 @@ app.post('/api/ask-ai', async (req, res) => {
     if (!prompt || typeof prompt !== 'string') {
       return res.status(400).json({ error: 'Missing or invalid `prompt` in request body.' });
     }
-    if (!process.env.OPENROUTER_API_KEY) {
+
+    const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+    if (!apiKey) {
       return res.status(500).json({ error: 'OPENROUTER_API_KEY is not set on the server.' });
     }
+
+    const modelId = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-lite-001';
 
     const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         // Keep this aligned with OpenRouter's available model IDs.
         // You can override via env var OPENROUTER_MODEL if needed.
-        "model": process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-lite-001",
+        "model": modelId,
         "messages": [
           {"role": "user", "content": prompt}
         ]
@@ -67,6 +71,23 @@ app.post('/api/ask-ai', async (req, res) => {
         status: aiResponse.status,
         body: data
       });
+
+      // Provide a quick actionable hint for the most common auth/config failures.
+      if (aiResponse.status === 401) {
+        return res.status(401).json({
+          error: 'OpenRouter authentication failed (401).',
+          details: data,
+          hint: 'Replace `OPENROUTER_API_KEY` in `backend/.env` with a valid OpenRouter key.'
+        });
+      }
+      if (aiResponse.status === 400) {
+        return res.status(400).json({
+          error: 'OpenRouter request failed (400).',
+          details: data,
+          hint: 'Check `OPENROUTER_MODEL` (it must be a valid OpenRouter model ID).'
+        });
+      }
+
       return res.status(502).json({
         error: 'OpenRouter request failed',
         status: aiResponse.status,

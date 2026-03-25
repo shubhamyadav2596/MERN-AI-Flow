@@ -6,7 +6,7 @@ import InputNode from './InputNode';
 import ResultNode from './ResultNode';
 
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2', animated: true }];
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+const API_BASE_URL = ('http://localhost:5000').replace(/\/$/, '');
 
 export default function App() {
   const [prompt, setPrompt] = useState('');
@@ -50,9 +50,12 @@ export default function App() {
       updateResultNode(res.data.answer);
     } catch (error) {
       console.error(error);
+      const errorData = error?.response?.data;
       const errorMsg =
-        error?.response?.data?.error ||
-        "Error fetching AI response.";
+        (errorData?.error && errorData?.hint)
+          ? `${errorData.error} ${errorData.hint}`
+          : errorData?.error ||
+            "Error fetching AI response.";
       setResponse(errorMsg);
       updateResultNode(errorMsg);
     } finally {
