@@ -6,6 +6,7 @@ import InputNode from './InputNode';
 import ResultNode from './ResultNode';
 
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2', animated: true }];
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 export default function App() {
   const [prompt, setPrompt] = useState('');
@@ -44,7 +45,7 @@ export default function App() {
     updateResultNode('Thinking...');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/ask-ai', { prompt });
+      const res = await axios.post(`${API_BASE_URL}/api/ask-ai`, { prompt });
       setResponse(res.data.answer);
       updateResultNode(res.data.answer);
     } catch (error) {
@@ -63,7 +64,7 @@ export default function App() {
   const handleSave = async () => {
     if (!prompt || !response || response === 'Thinking...') return alert('Run the flow first!');
     try {
-      await axios.post('http://localhost:5000/api/save', { prompt, response });
+      await axios.post(`${API_BASE_URL}/api/save`, { prompt, response });
       alert('Saved to MongoDB successfully!');
     } catch (error) {
       console.error(error);
