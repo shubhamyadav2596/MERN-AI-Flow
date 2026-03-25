@@ -38,30 +38,38 @@ npm install
 Create a .env file in the backend directory and add your credentials:
 
 #### Code snippet
+```
 PORT=5000
 MONGO_URI=your_mongodb_connection_string_here
 OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
 
 ### 3. Frontend Setup
 Navigate to the frontend directory and install dependencies:
 
 #### Bash
+```
 cd ../frontend
 npm install
+```
 🏃‍♂️ Running the Application
 You will need two terminal windows to run the frontend and backend simultaneously.
 
 ## Terminal 1 (Backend):
 
 #### Bash
+```
 cd backend
 npm start 
+```
 # Note: Ensure your package.json has "type": "module" enabled for ES6 imports.
 Terminal 2 (Frontend):
 
 #### Bash
+```
 cd frontend
 npm run dev
+```
 Open your browser and navigate to the localhost URL provided by Vite (usually http://localhost:5173).
 
 # 🌐 Links & Deliverables
